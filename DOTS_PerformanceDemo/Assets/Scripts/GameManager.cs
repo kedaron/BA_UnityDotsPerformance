@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject classicSpherePrefab;
 
 
-    private List<TestingSphereJobs> sphereListJobs;
+    private List<TestingSphereJobs> jobsSphereList;
 
     public class TestingSphereJobs
     {
@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
     {
         entitiyManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+        // ECS + Jobs
         if (useEcsAndJobs)
         {
             for (int i = 0; i < spawnAmount; i++)
@@ -47,13 +48,14 @@ public class GameManager : MonoBehaviour
                 CreateEntity(spawnLocation, movementSpeed);
             }
         }
+        // Jobs
         else if(useJobs)
         {
-            sphereListJobs = new List<TestingSphereJobs>();
+            jobsSphereList = new List<TestingSphereJobs>();
             for (int i = 0; i < spawnAmount; i++)
             {
                 Transform sphereGameObject = Instantiate(jobsSpherePrefab, new Vector3(0f, UnityEngine.Random.Range(-5f, 5f), 0f), Quaternion.identity);
-                sphereListJobs.Add(new TestingSphereJobs
+                jobsSphereList.Add(new TestingSphereJobs
                 {
                     transform = sphereGameObject,
                     movementSpeed = UnityEngine.Random.Range(1.0f, 6.0f),
@@ -61,6 +63,7 @@ public class GameManager : MonoBehaviour
                 });
             }
         }
+        // Default GameObjects with Scripts
         else
         {
             for (int i = 0; i < spawnAmount; i++)
@@ -70,7 +73,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    #region Jobs
     private void Update()
     {
         if (useJobs && !useEcsAndJobs)
@@ -80,16 +82,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Jobs
     private void ExecuteMovementJob()
     {
-        NativeArray<float3> positionArray = new NativeArray<float3>(sphereListJobs.Count, Allocator.TempJob);
-        NativeArray<float3> directionArray = new NativeArray<float3>(sphereListJobs.Count, Allocator.TempJob);
-        NativeArray<float> movementSpeedArray = new NativeArray<float>(sphereListJobs.Count, Allocator.TempJob);
-        for (int i = 0; i < sphereListJobs.Count; i++)
+        NativeArray<float3> positionArray = new NativeArray<float3>(jobsSphereList.Count, Allocator.TempJob);
+        NativeArray<float3> directionArray = new NativeArray<float3>(jobsSphereList.Count, Allocator.TempJob);
+        NativeArray<float> movementSpeedArray = new NativeArray<float>(jobsSphereList.Count, Allocator.TempJob);
+        for (int i = 0; i < jobsSphereList.Count; i++)
         {
-            positionArray[i] = sphereListJobs[i].transform.position;
-            directionArray[i] = sphereListJobs[i].direction;
-            movementSpeedArray[i] = sphereListJobs[i].movementSpeed;
+            positionArray[i] = jobsSphereList[i].transform.position;
+            directionArray[i] = jobsSphereList[i].direction;
+            movementSpeedArray[i] = jobsSphereList[i].movementSpeed;
         }
 
         MovementJob job = new MovementJob
@@ -101,11 +104,11 @@ public class GameManager : MonoBehaviour
             movementSpeed = movementSpeedArray
         };
 
-        job.Schedule(sphereListJobs.Count, sphereListJobs.Count/10).Complete();
+        job.Schedule(jobsSphereList.Count, jobsSphereList.Count/10).Complete();
 
-        for (int i = 0; i < sphereListJobs.Count; i++)
+        for (int i = 0; i < jobsSphereList.Count; i++)
         {
-            sphereListJobs[i].transform.position = positionArray[i];
+            jobsSphereList[i].transform.position = positionArray[i];
         }
 
         positionArray.Dispose();
@@ -115,12 +118,12 @@ public class GameManager : MonoBehaviour
 
     private void ExecuteDirectionJob()
     {
-        NativeArray<float3> positionArray = new NativeArray<float3>(sphereListJobs.Count, Allocator.TempJob);
-        NativeArray<float3> directionArray = new NativeArray<float3>(sphereListJobs.Count, Allocator.TempJob);
-        for (int i = 0; i < sphereListJobs.Count; i++)
+        NativeArray<float3> positionArray = new NativeArray<float3>(jobsSphereList.Count, Allocator.TempJob);
+        NativeArray<float3> directionArray = new NativeArray<float3>(jobsSphereList.Count, Allocator.TempJob);
+        for (int i = 0; i < jobsSphereList.Count; i++)
         {
-            positionArray[i] = sphereListJobs[i].transform.position;
-            directionArray[i] = sphereListJobs[i].direction;
+            positionArray[i] = jobsSphereList[i].transform.position;
+            directionArray[i] = jobsSphereList[i].direction;
         }
 
         DirectionJob job = new DirectionJob
@@ -129,11 +132,11 @@ public class GameManager : MonoBehaviour
             direction = directionArray,
         };
 
-        job.Schedule(sphereListJobs.Count, sphereListJobs.Count / 10).Complete();
+        job.Schedule(jobsSphereList.Count, jobsSphereList.Count / 10).Complete();
 
-        for (int i = 0; i < sphereListJobs.Count; i++)
+        for (int i = 0; i < jobsSphereList.Count; i++)
         {
-            sphereListJobs[i].direction = directionArray[i];
+            jobsSphereList[i].direction = directionArray[i];
         }
 
         positionArray.Dispose();
@@ -171,41 +174,4 @@ public class GameManager : MonoBehaviour
         return UnityEngine.Random.Range(0, 2) * 2 - 1;
     }
     #endregion
-}
-
-[BurstCompile]
-public struct MovementJob : IJobParallelFor
-{
-    public NativeArray<float> movementSpeed;
-    public NativeArray<float3> position;
-    public NativeArray<float3> direction;
-    public float deltaTime;
-    public bool doPseudoCalculations;
-
-    public void Execute(int index)
-    {
-        position[index] += direction[index] * movementSpeed[index] * deltaTime;
-
-        // Pseudo calculations
-        if (doPseudoCalculations)
-        {
-            // TODO
-        }
-    }
-}
-
-[BurstCompile]
-public struct DirectionJob : IJobParallelFor
-{
-    public NativeArray<float3> position;
-    public NativeArray<float3> direction;
-
-    public void Execute(int index)
-    {
-        if ((direction[index].x == 1 && position[index].x > 10f)
-        || (direction[index].x == -1 && position[index].x < -10f))
-        {
-            direction[index] = direction[index] * -1;
-        }
-    }
 }
