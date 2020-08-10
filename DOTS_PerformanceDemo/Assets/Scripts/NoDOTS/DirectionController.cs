@@ -4,24 +4,19 @@ using UnityEngine;
 
 public class DirectionController : MonoBehaviour
 {
-    private bool useJobs;
+    public Vector3 direction;
     private void Start()
     {
-        GameManager gameManager = GameObject.FindObjectOfType<GameManager>();
-        useJobs = gameManager.useJobs;
+        direction = new Vector3(UnityEngine.Random.Range(0, 2) * 2 - 1, 0f, 0f);
     }
 
     void Update()
     {
-        if (!useJobs)
+        var position = transform.position;
+        if ((direction.x == 1 && position.x > 10f)
+        || (direction.x == -1 && position.x < -10f))
         {
-            var direction = GetComponent<MovementController>().direction;
-            var position = GetComponent<MovementController>().transform.position;
-            if ((direction.x == 1 && position.x > 10f)
-            || (direction.x == -1 && position.x < -10f))
-            {
-                GetComponent<MovementController>().direction = direction * -1;
-            }
+            direction = direction * -1;
         }
     }
 }

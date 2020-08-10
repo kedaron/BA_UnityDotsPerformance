@@ -22,7 +22,13 @@ public struct MovementJob : IJobParallelFor
         // Pseudo calculations
         if (doPseudoCalculations)
         {
-            // TODO
+            for(int i = 0; i < 1000; i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    int drop = i * j;
+                }
+            }
         }
     }
 }

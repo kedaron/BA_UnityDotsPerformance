@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    public Vector3 direction;
     public float movementSpeed;
     private bool doPseudoCalculations;
     
@@ -13,17 +12,23 @@ public class MovementController : MonoBehaviour
     {
         GameManager gameManager = GameObject.FindObjectOfType<GameManager>();
         doPseudoCalculations = gameManager.doPseudoCalculations;
-        direction = new Vector3(UnityEngine.Random.Range(0, 2) * 2 - 1, 0f, 0f);
         movementSpeed = UnityEngine.Random.Range(1.0f, 6.0f);
     }
 
     void Update()
     {
+        var direction = GetComponent<DirectionController>().direction;
         transform.position += direction * movementSpeed * Time.deltaTime;
         // Pseudo calculations
         if (doPseudoCalculations)
         {
-            // TODO
+            for (int i = 0; i < 1000; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    int drop = i * j;
+                }
+            }
         }
     }
 }
