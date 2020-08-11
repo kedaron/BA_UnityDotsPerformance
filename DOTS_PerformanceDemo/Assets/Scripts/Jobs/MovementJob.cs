@@ -9,9 +9,12 @@ using UnityEngine;
 [BurstCompile]
 public struct MovementJob : IJobParallelFor
 {
+    [ReadOnly]
     public NativeArray<float> movementSpeed;
-    public NativeArray<float3> position;
+    [ReadOnly]
     public NativeArray<float3> direction;
+    public NativeArray<float3> position;
+
     public float deltaTime;
     public bool doPseudoCalculations;
 

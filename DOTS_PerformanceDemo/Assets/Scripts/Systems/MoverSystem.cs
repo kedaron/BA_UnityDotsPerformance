@@ -16,7 +16,7 @@ public class MoverSystem : SystemBase
     {
         var dt = Time.DeltaTime;
         var doPseudoCalculations = this.doPseudoCalculations;
-        Entities.ForEach((ref Translation position, ref MovementDirection direction, in MovementSpeed speed) =>
+        Entities.ForEach((ref Translation position, in MovementDirection direction, in MovementSpeed speed) =>
         {
             position.Value += direction.direction * speed.movementSpeed * dt;
             // Pseudo calculations

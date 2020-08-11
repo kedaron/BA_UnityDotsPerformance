@@ -9,6 +9,7 @@ using UnityEngine;
 [BurstCompile]
 public struct DirectionJob : IJobParallelFor
 {
+    [ReadOnly]
     public NativeArray<float3> position;
     public NativeArray<float3> direction;
 

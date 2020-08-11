@@ -20,13 +20,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject classicSpherePrefab;
 
 
-    private List<TestingSphereJobs> jobsSphereList;
+    private List<JobsTestingSphere> jobsSphereList;
 
-    public class TestingSphereJobs
+    public class JobsTestingSphere
     {
         public Transform transform;
         public float movementSpeed;
-        public Vector3 direction;
+        public float3 direction;
     }
 
     public int spawnAmount;
@@ -51,15 +51,15 @@ public class GameManager : MonoBehaviour
         // Jobs
         else if(useJobs)
         {
-            jobsSphereList = new List<TestingSphereJobs>();
+            jobsSphereList = new List<JobsTestingSphere>();
             for (int i = 0; i < spawnAmount; i++)
             {
                 Transform sphereGameObject = Instantiate(jobsSpherePrefab, new Vector3(0f, UnityEngine.Random.Range(-5f, 5f), 0f), Quaternion.identity);
-                jobsSphereList.Add(new TestingSphereJobs
+                jobsSphereList.Add(new JobsTestingSphere
                 {
                     transform = sphereGameObject,
                     movementSpeed = UnityEngine.Random.Range(1.0f, 6.0f),
-                    direction = new Vector3(RandomSign(), 0f, 0f)
+                    direction = new float3(RandomSign(), 0f, 0f)
                 });
             }
         }
