@@ -22,6 +22,13 @@ public class GameManager : MonoBehaviour
 
     private List<JobsTestingSphere> jobsSphereList;
 
+    public enum usageOption
+    {
+        Classic,
+        Jobs,
+        EcsAndJobs
+    }
+
     public class JobsTestingSphere
     {
         public Transform transform;
@@ -30,8 +37,7 @@ public class GameManager : MonoBehaviour
     }
 
     public int spawnAmount;
-    public bool useEcsAndJobs;
-    public bool useJobs;
+    public usageOption UsageType;
     public bool doPseudoCalculations;
 
     void Start()
@@ -39,7 +45,7 @@ public class GameManager : MonoBehaviour
         entitiyManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         // ECS + Jobs
-        if (useEcsAndJobs)
+        if (UsageType == usageOption.EcsAndJobs)
         {
             for (int i = 0; i < spawnAmount; i++)
             {
@@ -49,7 +55,7 @@ public class GameManager : MonoBehaviour
             }
         }
         // Jobs
-        else if(useJobs)
+        else if(UsageType == usageOption.Jobs)
         {
             jobsSphereList = new List<JobsTestingSphere>();
             for (int i = 0; i < spawnAmount; i++)
@@ -75,7 +81,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (useJobs && !useEcsAndJobs)
+        if (UsageType == usageOption.Jobs)
         {
             ExecuteMovementJob();
             ExecuteDirectionJob();

@@ -249,8 +249,7 @@ MonoBehaviour:
   classicSpherePrefab: {fileID: 6377364297093680985, guid: 3a3e7af34d1115147bb82d522be0ecdd,
     type: 3}
   spawnAmount: 1000
-  useEcsAndJobs: 0
-  useJobs: 0
+  UsageType: 0
   doPseudoCalculations: 0
 --- !u!4 &800005858
 Transform:
